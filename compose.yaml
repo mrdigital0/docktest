@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  web:
+    image: nginx:latest
+    container_name: test_nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./html:/usr/share/nginx/html
+    restart: unless-stopped
+
+  api:
+    image: node:18-alpine
+    container_name: test_api
+    working_dir: /app
+    command: sh -c "npm init -y && npm install express && node server.js"
+    volumes:
+      - ./api:/app
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+  db:
+    image: mariadb:10.11
+    container_name: test_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: testuser
+      MYSQL_PASSWORD: testpass
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
+
+volumes:
+  db_data:
